@@ -1,0 +1,13 @@
+/node_modules
+/dist
+/.vscode
+/.yalc
+/coverage
+/tmp
+
+yarn.lock
+package-lock.json
+
+*.log
+.DS_Store
+.cache

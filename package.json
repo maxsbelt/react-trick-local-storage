@@ -1,0 +1,56 @@
+{
+  "name": "react-trick-local-storage",
+  "description": "Keep list of data as single local storage value and use it with react",
+  "version": "0.1.0",
+  "author": "Sergey Makarov",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "module": "dist/react-trick-local-storage.esm.js",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test --coverage",
+    "lint:eslint": "tsdx lint src",
+    "lint:ts": "tsc --noEmit",
+    "prepare": "tsdx build"
+  },
+  "peerDependencies": {
+    "react": ">=16"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "homepage": "https://github.com/maxsbelt/react-trick-local-storage#README",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maxsbelt/react-trick-local-storage.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maxsbelt/react-trick-local-storage/issues"
+  },
+  "keywords": [
+    "local-storage",
+    "react"
+  ],
+  "devDependencies": {
+    "@testing-library/react-hooks": "^3.4.2",
+    "@types/react": "^16.9.52",
+    "@types/react-dom": "^16.9.8",
+    "husky": "^4.3.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-test-renderer": "^16.14.0",
+    "tsdx": "^0.14.0",
+    "tslib": "^2.0.3",
+    "typescript": "^4.0.3"
+  }
+}
