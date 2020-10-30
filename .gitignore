@@ -6,7 +6,6 @@
 /tmp
 
 yarn.lock
-package-lock.json
 
 *.log
 .DS_Store
