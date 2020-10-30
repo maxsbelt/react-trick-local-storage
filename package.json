@@ -17,8 +17,7 @@
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test --coverage",
-    "lint:eslint": "tsdx lint src",
-    "lint:ts": "tsc --noEmit",
+    "lint": "tsdx lint src",
     "prepare": "tsdx build"
   },
   "peerDependencies": {
