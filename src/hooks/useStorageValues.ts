@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useReducer, useRef, useEffect } from 'react';
 import { Storage } from '../types';
 
 export const useStorageValues = <
@@ -14,7 +14,7 @@ export const useStorageValues = <
   ...keys: K
 ): { [I in keyof K]: T[keyof T & K[I]] | undefined } => {
   const typedStorage = (storage as unknown) as Storage<T>;
-  const [, setRenderKey] = useState(0);
+  const [, forceRerender] = useReducer((prev) => prev + 1, 0);
   const keysRef = useRef(keys);
   keysRef.current = keys;
 
@@ -22,10 +22,10 @@ export const useStorageValues = <
     () =>
       typedStorage.subscribe((event) => {
         if (!event.modifiedKeys) return;
-        const triggerUpdate = event.modifiedKeys.some((key) =>
+        const triggerRerender = event.modifiedKeys.some((key) =>
           keysRef.current.includes(key),
         );
-        if (triggerUpdate) setRenderKey((prev) => prev + 1);
+        if (triggerRerender) forceRerender();
       }),
     [typedStorage],
   );
