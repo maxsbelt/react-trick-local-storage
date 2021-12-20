@@ -39,9 +39,15 @@ export const createStorage = <
         return row;
       });
 
-      const value = result
-        ? (result.value as T[Exclude<K, string>])
-        : undefined;
+      let value = result ? (result.value as T[Exclude<K, string>]) : undefined;
+
+      if (result && result.expires) {
+        const time = (Date.now() - result.createdAt) / 1000;
+        if (time > result.expires) {
+          value = undefined;
+        }
+      }
+
       triggerEvent({
         code: 'get',
         payload: { key, value },
@@ -51,16 +57,23 @@ export const createStorage = <
 
     getAll: () => rows,
 
-    set: (key, value, { inSession = false, inMemory = false } = {}) => {
+    set: (
+      key,
+      value,
+      { inSession = false, inMemory = false, expires } = {},
+    ) => {
       rows = exclude(key);
 
       const row: Row<T> = {
         key,
         value,
-        createdAt: new Date().toISOString(),
+        createdAt: Date.now(),
       };
       if (inSession) row.inSession = true;
       if (inMemory) row.inMemory = true;
+      if (typeof expires === 'number' && expires > 0) {
+        row.expires = expires;
+      }
 
       save([...rows, row]);
       triggerEvent({

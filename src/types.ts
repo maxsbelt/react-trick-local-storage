@@ -8,6 +8,11 @@ export interface RowOptions {
    * If 'true' record won't be saved in localStorage (disappear on page refresh).
    */
   inMemory?: boolean;
+
+  /**
+   * If specified indicates that the data remains in storage until N seconds after record is created.
+   */
+  expires?: number;
 }
 
 export type Row<
@@ -25,9 +30,9 @@ export type Row<
   value: T[K];
 
   /**
-   * Creation date.
+   * Creation timestamp.
    */
-  createdAt: string;
+  createdAt: number;
 } & RowOptions;
 
 export interface CreateStorageOptions<T> {

@@ -13,7 +13,7 @@ const localStorageMock = {
     ];
     const actualRows: Row[] = rows.map((row) => ({
       ...row,
-      createdAt: new Date().toISOString(),
+      createdAt: Date.now(),
     }));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(actualRows));
   },
@@ -113,6 +113,18 @@ describe('helpers/createStorage', () => {
       s.set('key1', true);
       s.set('key1', 'value');
     });
+
+    it('sets expires', () => {
+      storage.set('key', 'value', {
+        expires: 100,
+      });
+
+      const expectedResult: MockedRow[] = [
+        { key: 'key', value: 'value', expires: 100 },
+      ];
+      expect(getAllKeys()).toEqual(expectedResult);
+      expect(localStorageMock.read()).toEqual(expectedResult);
+    });
   });
 
   describe('get', () => {
@@ -134,9 +146,29 @@ describe('helpers/createStorage', () => {
     it('returns correct types', () => {
       const s = createStorage<{ key1: string }>({ key: 'any' });
       // @ts-expect-error
-      const result1: boolean = s.get('key1')!; // eslint-disable-line @typescript-eslint/no-unused-vars
-      const result2: string = s.get('key1')!;
+      const result1 = s.get('key1') as boolean; // eslint-disable-line @typescript-eslint/no-unused-vars
+      const result2 = s.get('key1') as string;
       expect(result2).toEqual('value');
+    });
+
+    it('returns undefined if data is expired', () => {
+      const dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => 0);
+
+      const s = createStorage<{ key: string }>({ key: 'any' });
+      s.set('key', 'value', { expires: 61 });
+
+      let value = s.get('key');
+      expect(value).toEqual('value');
+
+      dateNowSpy.mockImplementation(() => 60000);
+      value = s.get('key') as string;
+      expect(value).toEqual('value');
+
+      dateNowSpy.mockImplementation(() => 62000);
+      value = s.get('key');
+      expect(value).toBeUndefined();
+
+      dateNowSpy.mockRestore();
     });
   });
 
