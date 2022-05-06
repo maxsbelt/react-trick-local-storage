@@ -17,7 +17,16 @@ export const createStorage = <
 
   const save = (newRows: Row<T>[]) => {
     const serialized = JSON.stringify(newRows.filter((row) => !row.inMemory));
-    window.localStorage.setItem(options.key, serialized);
+    try {
+      window.localStorage.setItem(options.key, serialized);
+    } catch {
+      triggerEvent({
+        code: 'warning',
+        payload: {
+          message: 'localStorage API is not available.',
+        },
+      });
+    }
     rows = newRows;
 
     triggerEvent({
@@ -119,10 +128,23 @@ export const createStorage = <
 };
 
 const load = <T>({ key, onEvent }: Required<CreateStorageOptions<T>>) => {
+  let item: string | null = null;
+
+  try {
+    item = window.localStorage.getItem(key);
+  } catch {
+    onEvent({
+      code: 'warning',
+      payload: {
+        message: 'localStorage API is not available.',
+      },
+    });
+  }
+
   let rows: Row<T>[] = [];
 
   try {
-    rows = JSON.parse(window.localStorage.getItem(key) || '[]');
+    rows = JSON.parse(item || '[]');
   } catch {
     onEvent({
       code: 'loadError',

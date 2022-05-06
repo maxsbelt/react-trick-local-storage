@@ -1,7 +1,7 @@
 {
   "name": "react-trick-local-storage",
   "description": "Keep list of data as single local storage value and use it with react",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Sergey Makarov",
   "license": "MIT",
   "main": "dist/index.js",

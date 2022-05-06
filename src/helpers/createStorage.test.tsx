@@ -48,6 +48,30 @@ describe('helpers/createStorage', () => {
   });
 
   describe('initialization', () => {
+    describe('localStorage is forbidden', () => {
+      const getItem = Storage.prototype.getItem;
+
+      beforeEach(() => {
+        Storage.prototype.getItem = () => {
+          throw new Error(
+            "Failed to read the 'localStorage' property from 'Window': Access is denied for this document",
+          );
+        };
+      });
+
+      afterEach(() => {
+        Storage.prototype.getItem = getItem;
+      });
+
+      it('triggers warning', () => {
+        initStorage();
+        expect(getAllKeys()).toEqual([]);
+        expect(onEvent.mock.calls.length).toBe(2);
+        expect(onEvent.mock.calls[0][0].code).toEqual('warning');
+        expect(onEvent.mock.calls[1][0].code).toEqual('load');
+      });
+    });
+
     describe('corrupted data', () => {
       it('triggers loadError event and uses [] as default', () => {
         const values = [undefined, '{}'];
@@ -124,6 +148,41 @@ describe('helpers/createStorage', () => {
       ];
       expect(getAllKeys()).toEqual(expectedResult);
       expect(localStorageMock.read()).toEqual(expectedResult);
+    });
+
+    describe('localStorage is forbidden', () => {
+      const setItem = Storage.prototype.setItem;
+
+      beforeEach(() => {
+        Storage.prototype.setItem = () => {
+          throw new Error(
+            "Failed to read the 'localStorage' property from 'Window': Access is denied for this document",
+          );
+        };
+      });
+
+      afterEach(() => {
+        Storage.prototype.setItem = setItem;
+      });
+
+      it('triggers warning', () => {
+        storage.set('key', 'value');
+
+        const expectedResult: MockedRow[] = [{ key: 'key', value: 'value' }];
+        expect(getAllKeys()).toEqual(expectedResult);
+        expect(localStorageMock.read()).toEqual([]);
+
+        expect(onEvent.mock.calls.length).toBe(4);
+        expect(onEvent.mock.calls[0][0].code).toEqual('load');
+        expect(onEvent.mock.calls[1][0].code).toEqual('warning');
+        expect(onEvent.mock.calls[2][0].code).toEqual('save');
+        expect(onEvent.mock.calls[3][0]).toEqual(
+          expect.objectContaining({
+            code: 'set',
+            modifiedKeys: ['key'],
+          }),
+        );
+      });
     });
   });
 
